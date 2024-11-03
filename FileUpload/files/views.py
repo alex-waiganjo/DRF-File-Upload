@@ -8,7 +8,11 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import status
 
 
+
 class FileUploadView(APIView):
+    # Throttle Scope
+    throttle_scope = "low"
+
     parser_classes = (MultiPartParser, FormParser)
 
     def post(self, request):
@@ -40,16 +44,25 @@ class FileUploadView(APIView):
 
 
 class FileListView(generics.ListAPIView):
+     # Throttle Scope
+    throttle_scope = "high"
+
     queryset = File.objects.all()
     serializer_class = FileSerializer
 
 
 class FileDetailView(generics.RetrieveUpdateDestroyAPIView):
+     # Throttle Scope
+    throttle_scope = "low"
+
     queryset = File.objects.all()
     serializer_class = FileSerializer
 
 
 class FilePreviewView(APIView):
+     # Throttle Scope
+    throttle_scope = "high"
+
     def get(self, request, pk):
         try:
             # Retrieve file instance by id

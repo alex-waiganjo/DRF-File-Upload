@@ -3,10 +3,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-0)(efj_afichps2u%()39kgwa()1%2-sybhb!lmzsvii8e!fqz'
 
@@ -29,6 +25,19 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_yasg',
 ]
+
+# Rest Framework Throtting Config
+REST_FRAMEWORK = {
+
+    'DEFAULT_THROTTLE_CLASSES': [      
+        "rest_framework.throttling.ScopedRateThrottle"
+    ],
+
+    'DEFAULT_THROTTLE_RATES': {
+        'high': '7/min',
+        'low': '4/min'
+    }
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
