@@ -29,6 +29,7 @@ def parse_excel(file):
     return sanitized_data
 
 
+
 # Handle PDF reading and extraction
 # def parse_pdf(file):
 #     pdf_reader = PyPDF2.PdfReader(file)

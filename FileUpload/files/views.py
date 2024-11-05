@@ -1,3 +1,4 @@
+import os
 from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -6,7 +7,8 @@ from .serializers import FileSerializer
 from .helpers import parse_excel,parse_pdf
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import status
-
+import pandas as pd
+import pandas as pd
 
 
 class FileUploadView(APIView):
@@ -81,3 +83,21 @@ class FilePreviewView(APIView):
         
         except File.DoesNotExist:
             return Response({"error": "File not found."}, status=status.HTTP_404_NOT_FOUND)
+
+
+class ColumnDataView(APIView):
+    # Throttle Scope
+    throttle_scope = "low"
+
+    def get(self, request,pk):
+        # Get file ID and column name from the request data
+                
+        file_instance = File.objects.get(pk=pk) 
+        df = pd.read_excel(file_instance.file)
+        column_names = df.columns.to_list() 
+        file_name = os.path.basename(file_instance.file.name)            
+
+
+        return Response({"file_id":f'{file_instance.id}',"file name": f'{file_name}',"available_columns": column_names},status=status.HTTP_201_CREATED)
+
+      
