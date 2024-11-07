@@ -1,4 +1,5 @@
 import os
+from django.shortcuts import get_object_or_404
 from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -8,7 +9,7 @@ from .helpers import parse_excel, parse_pdf
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import status
 import pandas as pd
-import pandas as pd
+from rest_framework.decorators import action
 
 
 class FileUploadView(APIView):
@@ -98,3 +99,39 @@ class ColumnDataView(APIView):
         file_name = os.path.basename(file_instance.file.name)
 
         return Response({"file_id": f'{file_instance.id}', "file name": f'{file_name}', "available_columns": column_names}, status=status.HTTP_201_CREATED)
+    
+
+class RowsDataView(APIView):
+    # Throttle Scope
+    throttle_scope = "high"
+
+    def get(self, request, pk=None):
+        # Extract the file ID and requested columns from the request data
+        requested_columns = request.data.get('available_columns')
+        if not requested_columns:
+            return Response({"error": "No columns specified"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Fetch the file instance
+        file_instance = get_object_or_404(File, pk=pk)
+        
+        # Load the file into a DataFrame
+        df = pd.read_excel(file_instance.file)
+        
+        # Check if requested columns are available in the DataFrame
+        missing_columns = [col for col in requested_columns if col not in df.columns]
+        if missing_columns:
+            return Response({
+                "error": f"The following columns are not available in the file: {missing_columns}"
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Filter the DataFrame based on the requested columns
+        filtered_df = df[requested_columns]
+        
+        # Convert the filtered data to a list of dictionaries (records)
+        rows = filtered_df.to_dict(orient='records')
+        
+        return Response({
+            "file_id": f"{file_instance.id}",
+            "file name": os.path.basename(file_instance.file.name),
+            "filtered_data": rows
+        }, status=status.HTTP_200_OK)

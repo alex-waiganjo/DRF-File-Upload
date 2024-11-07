@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import FileUploadView, FileListView, FileDetailView, FilePreviewView,ColumnDataView
+from .views import FileUploadView, FileListView, FileDetailView,RowsDataView, FilePreviewView,ColumnDataView
 
 urlpatterns = [
     path('files/upload/', FileUploadView.as_view(), name='file-upload'),
@@ -7,4 +7,5 @@ urlpatterns = [
     path('file/<int:pk>/', FileDetailView.as_view(), name='file-detail'),
     path('file/<int:pk>/preview/', FilePreviewView.as_view(), name='file-preview'),
     path('file/<int:pk>/get-columns/', ColumnDataView.as_view(), name='file-column-data'),
+    path('file/<int:pk>/get-rows/', RowsDataView.as_view(), name='get-rows-by-column'),
 ]
